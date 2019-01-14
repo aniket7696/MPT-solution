@@ -1,0 +1,72 @@
+***************************************************************UI****************************************
+@model AirlineReservationSystem.Models.User
+
+@{
+    ViewBag.Title = "AdminLogin";
+    Layout = "~/Views/_ARSLayout.cshtml";
+}
+
+<h2>AdminLogin</h2>
+
+@using (Html.BeginForm())
+{
+    <fieldset>
+
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true)
+        @if (@ViewBag.Message != null)
+        {
+            <div style="border: 1px solid red">
+                @ViewBag.Message
+            </div>
+        }
+        <table>
+            <tr>
+                <td>Login ID: </td>
+                <td>@Html.TextBoxFor(a => a.Username)</td>
+                <td>@Html.ValidationMessageFor(a => a.Username)</td>
+            </tr>
+            <tr>
+                <td>Password: </td>
+                <td>@Html.PasswordFor(a => a.UserPassword)</td>
+                <td>@Html.ValidationMessageFor(a => a.UserPassword)</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <input type="submit" value="Login" />
+                </td>
+                <td></td>
+            </tr>
+        </table>
+    </fieldset>
+}
+***************************************************Backend**************************************************************
+public ActionResult AdminLogin()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult AdminLogin(User objUser)
+        {
+            if (ModelState.IsValid)
+            {
+           
+                    var obj = db.Users.Where(a => a.Username.Equals(objUser.Username)
+                                               && a.UserPassword.Equals(objUser.UserPassword)).FirstOrDefault();
+                    if (obj != null)
+                    {
+                        Session["Username"] = obj.Username.ToString();
+                        return RedirectToAction("Home");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "Login data is incorrect!");
+                    }
+                
+            }
+            return View(objUser);
+        }
+
+
